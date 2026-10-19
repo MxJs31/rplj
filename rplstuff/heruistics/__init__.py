@@ -15,4 +15,7 @@ for child in Path(__spec__.submodule_search_locations[0]).iterdir():
 
     analyzers[child.stem] = import_module(child.stem)
 
-del sys.path[0], Path, import_module, sys, child
+if __spec__.submodule_search_locations[0] in sys.path:
+    sys.path.remove(__spec__.submodule_search_locations[0])
+
+del Path, import_module, sys, child

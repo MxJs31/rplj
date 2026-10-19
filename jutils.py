@@ -1,6 +1,9 @@
 from pathlib import Path
 
 AUTO_PROMPT = None
+HIDE_PROGRESS = False
+ANIM_PROGRESS = 0
+ANIM_CHAR_SET = r"\|/-"
 
 def prompt(message, yes='y', no='n', *, force=False):
     if AUTO_PROMPT is not None and not force:
@@ -24,3 +27,27 @@ def free_path(path):
         i += 1
 
     return result_path
+
+def progress(message='', done=None, total=None, anim_only=False):
+    global ANIM_PROGRESS
+
+    if HIDE_PROGRESS:
+        return
+
+    result = [(
+        ANIM_CHAR_SET[ANIM_PROGRESS] if done is None or done != total
+        else 'V'
+    )]
+
+    if not anim_only:
+        if message:
+            result.append(message)
+
+        result.append(f'({done} / {total})')
+
+    print(' '.join(result), end='\r')
+
+    ANIM_PROGRESS += 1
+
+    if not (0 <= ANIM_PROGRESS < len(ANIM_CHAR_SET)):
+        ANIM_PROGRESS = 0

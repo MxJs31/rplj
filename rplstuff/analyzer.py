@@ -5,13 +5,14 @@ from zipfile import ZipFile
 from io import BytesIO
 from subprocess import run
 from warnings import warn
+from time import time
 import sys
 
 from PIL import Image
 
 from rplj.rplstuff.placers import Placers
 from rplj.rplstuff.heruistics import analyzers
-from rplj.jutils import free_path
+from rplj.jutils import free_path, progress
 
 class Suspect(SimpleNamespace):
     def __init__(self, *args, **kwargs):
@@ -47,9 +48,12 @@ class BackupAnalyzer:
     def analyze(self, args, commits):
         output = None
         current_placers = None
+        len_commits = len(commits)
+        progress_ts = 0
 
         try:
-            for commit_hash, commit_ts in commits:
+            for i in range(len_commits):
+                commit_hash, commit_ts = commits[i]
                 canvas, placers = self.extract_data(commit_hash, args.repo_dir)
 
                 if output is None:
@@ -58,6 +62,11 @@ class BackupAnalyzer:
 
                     if args.excluded:
                         break
+
+                if time() - progress_ts >= 1:
+                    progress('analyzing backups', i, len_commits)
+
+                    progress_ts = time()
 
                 self.feed(commit_ts=commit_ts, canvas=canvas, placers=placers)
 

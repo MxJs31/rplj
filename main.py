@@ -50,6 +50,8 @@ def parse_arguments():
         dest='dump'
     )
 
+    parser.add_argument('--hide-progress', action='store_true')
+
     y_or_n = parser.add_mutually_exclusive_group()
 
     y_or_n.add_argument(
@@ -121,5 +123,6 @@ def main():
             overwrite = True
 
     rplj.jutils.AUTO_PROMPT = args.y or (not args.n and None)
+    rplj.jutils.HIDE_PROGRESS = args.hide_progress
 
     scan_commits(args, init_repo(args), overwrite)

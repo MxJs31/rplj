@@ -2,15 +2,24 @@ from subprocess import run
 from io import BytesIO
 from zipfile import ZipFile
 from warnings import warn
+from time import time
 import sys
 
 from rplj.rplstuff.analyzer import BackupAnalyzer
+from rplj.jutils import progress
 
 def purge(args, commits, dirty_pixels, suspects):
     clean_pixels = set()
+    progress_ts = 0
+    total = len(dirty_pixels)
 
     try:
         for commit_hash, commit_ts in commits:
+            if time() - progress_ts >= 1:
+                    progress('purging pixels', len(clean_pixels), total)
+
+                    progress_ts = time()
+
             if len(dirty_pixels) == 0:
                 break
 
