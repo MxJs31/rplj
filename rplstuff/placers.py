@@ -1,4 +1,6 @@
 from array import array
+from functools import cached_property
+from collections import defaultdict
 import sys
 
 class Placers(array):
@@ -10,6 +12,15 @@ class Placers(array):
     else:
         def __new__(cls, placers):
             return super().__new__(cls, 'I', placers)
+
+    @cached_property
+    def as_dict(self):
+        dct = defaultdict(set)
+
+        for i, placer_id in enumerate(self):
+            dct[placer_id].add(i)
+
+        return dct
 
     def get_top_placers(self):
         top_placers = {}
@@ -27,11 +38,7 @@ class Placers(array):
         )
 
     def get_placer_pixels(self, target_placer_id):
-        return {
-            i
-            for i, placer_id in enumerate(self)
-            if placer_id == target_placer_id
-        }
+        return self.as_dict[target_placer_id]
 
     def get_placer_pixel_count(self, target_placer_id):
         return self.count(target_placer_id)
