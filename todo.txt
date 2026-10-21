@@ -1,2 +1,0 @@
-1. Progess saving/resuming;
-2. MB analyzer.
