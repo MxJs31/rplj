@@ -68,7 +68,12 @@ def scan(analyzer):
             for a in (len(activity) > 2 and activity[1 : -1] or activity)
         ])
         uh = sum([
-            a[2]
+            a[2] / (
+                isclose(a[0], max_pps, rel_tol=analyzer.rel_tol)
+                and not isclose(a[0], m, rel_tol=analyzer.rel_tol)
+                and 2
+                or 1
+            )
             for a in activity
             if isclose(a[0], m, rel_tol=analyzer.rel_tol)
                 or isclose(a[0], max_pps, rel_tol=analyzer.rel_tol)
@@ -80,7 +85,10 @@ def scan(analyzer):
                     intolerable_unemployment,
                     rel_tol=analyzer.rel_tol
                 )):
-            analyzer.suspects[placer_id].is_bot = True
+            analyzer.suspects[placer_id].traits['unemployed'] += (
+                0.6 * uh
+                / intolerable_unemployment
+            )
         else:
             analyzer.suspects[placer_id].clean_pixels.update(*[
                 a[1]

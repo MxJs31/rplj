@@ -8,10 +8,11 @@ import sys
 from rplj.rplstuff.analyzer import BackupAnalyzer
 from rplj.jutils import progress
 
-def purge(args, commits, dirty_pixels, suspects):
+def purge(args, commits, dirty_pixels, analyzer):
     clean_pixels = set()
     progress_ts = 0
     total = len(dirty_pixels)
+    suspects = analyzer.suspects
 
     try:
         for commit_hash, commit_ts in commits:
@@ -33,7 +34,7 @@ def purge(args, commits, dirty_pixels, suspects):
 
             for i in dirty_pixels:
                 if (i in suspects[placers[i]].clean_pixels
-                    or (not suspects[placers[i]].is_bot
+                    or (not analyzer.is_bot(placers[i])
                         and i not in suspects[placers[i]].botted_pixels)):
                     clean_pixels.add((i, canvas_bytes[i]))
                     deferred_remove.add(i)

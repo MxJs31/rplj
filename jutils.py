@@ -45,7 +45,10 @@ def progress(message='', done=None, total=None, anim_only=False):
 
         result.append(f'({done} / {total})')
 
-    print(' '.join(result), end='\r')
+    print(' '.join(result), end=(
+        '\r' if done is None or done != total
+        else '\n'
+    ))
 
     ANIM_PROGRESS += 1
 

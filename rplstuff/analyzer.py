@@ -6,6 +6,8 @@ from io import BytesIO
 from subprocess import run
 from warnings import warn
 from time import time
+from math import isclose
+from collections import defaultdict
 import sys
 
 from PIL import Image
@@ -16,11 +18,14 @@ from rplj.jutils import free_path, progress
 
 class Suspect(SimpleNamespace):
     def __init__(self, *args, **kwargs):
-        self.is_bot = False
+        self.traits = defaultdict(float)
         self.botted_pixels = set()
         self.clean_pixels = set()
 
         super().__init__(*args, **kwargs)
+
+    def bot_score(self):
+        return min(1, max(0, sum(self.traits.values())))
 
 class Suspects(dict):
     def __missing__(self, key):
@@ -127,6 +132,13 @@ class BackupAnalyzer:
         self.suspects = suspects
 
         return True
+
+    def is_bot(self, placer_id):
+        return isclose(
+            self.suspects[placer_id].bot_score(),
+            1,
+            rel_tol=self.rel_tol
+        )
 
     @staticmethod
     def extract_data(commit_hash, repo_dir):

@@ -74,7 +74,7 @@ def scan_commits(args, commits, overwrite_output):
     if args.excluded:
         if not analyzer.parse_suspects(args.excluded):
             for splacer_id in args.excluded.replace(',', ' ').split():
-                analyzer.suspects[int(splacer_id)].is_bot = True
+                analyzer.suspects[int(splacer_id)].traits['excluded'] = 1
 
     suspects = analyzer.suspects
 
@@ -87,10 +87,10 @@ def scan_commits(args, commits, overwrite_output):
     clean_pixels = rstalin.purge(args, commits, {
         i
         for i, placer_id in enumerate(current_placers)
-        if (suspects[placer_id].is_bot
+        if (analyzer.is_bot(placer_id)
             or i in suspects[placer_id].botted_pixels)
         and i not in suspects[placer_id].clean_pixels
-    }, suspects)
+    }, analyzer)
 
     if args.template:
         output.putpalette(
